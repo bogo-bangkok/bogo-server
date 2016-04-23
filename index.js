@@ -1,9 +1,21 @@
+// ========== core dependency ========================
+	var express = require('express');
+	var app = express();
+	
+// ========set port for heroku and listen to this port ====================
+   app.set('port', (process.env.PORT || 5000));
+
+   app.get('/', function(request, response) {
+	  console.log('Hello');
+	});
+
+	
 // ============= for Ajax decoding ==================================
-var express = require('express');
+
 var bodyParser = require('body-parser');
 var multer = require('multer'); // v1.0.5
 var upload = multer(); // for parsing multipart/form-data
-var app = express();
+
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
@@ -33,8 +45,9 @@ app.post('/sendemail', function(req, res) {
 	console.log("in sendemail function");	
 	console.log(req.body);	
 	var emailTo = req.body.to;	
+	var emailSubject = req.body.subject;	
 	var emailContent = req.body.content;
-	sendEmail(emailTo, emailContent) ;
+	sendEmail(emailTo, emailSubject, emailContent) ;
 	// console.log(req.params[0]);
 	// console.log(req.query.to);
 	// res.json(req.body);
@@ -59,7 +72,7 @@ function sendSms (phoneNumber, smsContent){
 	});
 }
 
-function sendEmail(emailTo, emailContent) { 
+function sendEmail(emailTo, subject, emailContent) { 
 	var transporter = nodemailer.createTransport({
 	  service: "gmail",
 	  auth: {
@@ -79,9 +92,9 @@ function sendEmail(emailTo, emailContent) {
 	var mailOptions = {
 		from: '"Bogo Bangkok" <bogo.bangkok@gmail.com>', // sender address
 		to: emailTo, //'b40nua@yahoo.com, nuchareeoil@gmail.com', // list of receivers
-		subject: emailContent, //'Hello 5', // Subject line
-		text: 'Hello world', // plaintext body
-		html: '<b>Hello world</b>' // html body
+		subject: subject, //'Hello 5', // Subject line
+		text: emailContent, // plaintext body
+		html: emailContent // html body
 	};
 
 	// send mail with defined transport object
@@ -93,5 +106,7 @@ function sendEmail(emailTo, emailContent) {
 	});		
 }
 
-app.listen(1337);
+app.listen(app.get('port'), function() {
+  console.log('Node app is running on port', app.get('port'));
+});
 
